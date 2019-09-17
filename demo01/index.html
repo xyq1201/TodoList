@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="app">
+        <div>
+            <!-- 绑定文本框输入的内容 -->
+            <input type="text" placeholder="请输入内容" v-model="newValue"/>
+            <!-- 为按钮添加事件 -->
+            <button @click="handleSubmit">提交</button>
+        </div>
+        <!-- 拆分组件 -->
+        <ul>
+            <!-- <li v-for="(item,index) in lists" :key="index">{{item}}</li> -->
+           
+            <!-- 使用组件 -->
+            <!-- 同样循环遍历lists -->
+            <!-- 为保证渲染出外部传进的不同值，需要属性传参-content属性,其值等于循环的每项内容 -->
+            <item-list v-for="(item,index) in lists" :key="index"
+             :content="item" :index="index"
+             @delete="handleDelete(index)"></item-list>
+             <!-- 监听子组件delete事件,delete事件被触发，则触发父组件删除事件 -->
+        </ul>
+
+    </div>
+    <script>
+        // 定义全局组件:item-list-组件名称（每个组件都是vue的实例）
+        Vue.component('item-list',{
+            // 外层或父组件，向item-list组件传递了content,kye,该组件需要接收
+            props:['content','index'],
+            // 组件模板
+            // 使用{{}}
+            template:'<li @click="handleInfo">{{content}}</li>',
+            // 子组件的方法
+            methods:{
+                // 点击触发handleInfo方法
+                handleInfo(){
+                    // alert('hello')
+                    // 当子组件被点击时，通知父组件将其删除
+                    this.$emit('delete',this.index)
+                }
+            }
+
+        })
+        // // 定义局部组件ItemList
+        // var ItemList = {
+        //     // 组件模板
+        //     template:'<li>{{content}}</li>'
+        // }
+        var app = new Vue({
+            el: "#app",
+            // // 若使用局部组件，必须对局部组件进行注册
+            // componets:{
+            //     // 在vue实例中，使用局部组件ItemList，通过<item-list>标签来使用
+            //     "item-list":ItemList
+            // },
+            data: {
+                // 初始化文本框内容
+                newValue: "",
+                // 初始化列表内容
+                lists:[]
+            },
+            methods:{
+                handleSubmit(){
+                    // 将文本框输入的内容添加到列表lists中
+                    this.lists.push(this.newValue)
+                    // 添加后并清空输入框
+                    this.newValue = ''
+                },
+                // 父组件添加handleDelete方法
+                // 参数index
+                handleDelete(index){
+                    console.log(index)
+                    // 删除当前点击的item对应下标index的内容
+                    this.lists.splice(index,1)
+                }
+            }
+        })
+    </script>
+</body>
+
+</html>
